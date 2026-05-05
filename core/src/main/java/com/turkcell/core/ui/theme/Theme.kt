@@ -30,3 +30,4 @@ fun TicketAppTheme(content: @Composable () -> Unit) {
         content = content
     )
 }
+
