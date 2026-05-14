@@ -40,7 +40,7 @@ class LoginViewModel(
         viewModelScope.launch {
             authRepository.login(current.email, current.password)
                 .onSuccess { _state.update { it.copy(isLoading = false, isLoggedIn = true) }  }
-                .onFailure { error -> _state.update { it.copy(isLoading = false, errorMessage = error.message) } }
+                .onFailure { error -> _state.update { it.copy(isLoading = false, errorMessage = error.toUserMessage()) } }
         }
     }
 }
@@ -48,6 +48,7 @@ class LoginViewModel(
 internal fun Throwable.toUserMessage(): String = when(this)
 {
     is ApiException -> when(code) {
+        409 -> "Email mevcut"
         401 -> "Email veya şifre hatalı"
         in 500..599 -> "Sunucu şu anda cevap veremiyor"
         else -> "Beklenmeyen bir hata oluştu"

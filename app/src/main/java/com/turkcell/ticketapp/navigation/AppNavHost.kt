@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.turkcell.ticketapp.screen.LoginScreen
+import com.turkcell.ticketapp.screen.RegisterScreen
 
 
 @Composable
@@ -23,7 +24,17 @@ fun AppNavHost(
             )
         }
         composable<Register> {
-            Text("Register Screen")
+            RegisterScreen(
+                onRegisterSuccess = {
+                    navController.navigate(Home) {
+                        popUpTo(Login) { inclusive = true }
+                    }
+                },
+                onNavigateToLogin = {navController.navigate(Login)}
+            )
+        }
+        composable<Home> {
+            Text("Ana Sayfa")
         }
     }
 }
