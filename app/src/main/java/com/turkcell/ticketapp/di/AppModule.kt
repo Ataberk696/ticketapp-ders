@@ -1,6 +1,7 @@
 package com.turkcell.ticketapp.di
 
 
+import com.turkcell.ticketapp.viewmodel.HomeViewModel
 import com.turkcell.ticketapp.viewmodel.LoginViewModel
 import com.turkcell.ticketapp.viewmodel.RegisterViewModel
 import org.koin.core.module.dsl.viewModelOf
@@ -10,4 +11,5 @@ val appModule = module {
     // viewmodel
     viewModelOf(::LoginViewModel)
     viewModelOf(::RegisterViewModel)
+    viewModelOf(::HomeViewModel)
 }
