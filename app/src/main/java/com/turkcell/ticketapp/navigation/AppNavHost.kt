@@ -60,7 +60,10 @@ private fun AuthedNavHost(navController: NavHostController){
             val route: EventDetail = backStackEntry.toRoute()
             EventDetailScreen(
                 eventId = route.id,
-                onBack = {navController.popBackStack()}
+                onBack = {navController.popBackStack()},
+                onPurchaseSuccess = {
+                    navController.popBackStack()
+                }
             )
         }
     }

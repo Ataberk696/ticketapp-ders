@@ -14,6 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.turkcell.core.domain.event.TicketType
 import com.turkcell.core.util.formatEventDate
 import com.turkcell.ticketapp.viewmodel.EventDetailViewModel
+import com.turkcell.ticketapp.viewmodel.PurchaseViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -23,13 +24,57 @@ import org.koin.core.parameter.parametersOf
 fun EventDetailScreen(
     eventId: String,
     viewModel: EventDetailViewModel = koinViewModel(),
-    onBack: () -> Unit
+    purchaseViewModel: PurchaseViewModel = koinViewModel(),
+    onBack: () -> Unit,
+    onPurchaseSuccess: () -> Unit = {}
 )
 {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val purchaseState by purchaseViewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(eventId) {
         viewModel.loadEvent(eventId)
+    }
+
+    LaunchedEffect(purchaseState.isPaid) {
+        if (purchaseState.isPaid) {
+            onPurchaseSuccess()
+        }
+    }
+
+    if (purchaseState.error !=null){
+        AlertDialog(
+            onDismissRequest = {purchaseViewModel.consumeError()},
+            title = { Text("Hata") },
+            text = { Text(purchaseState.error!!) },
+            confirmButton = {
+                TextButton(onClick = {purchaseViewModel.consumeError()}) {
+                    Text("Tamam")
+                }
+            }
+        )
+    }
+
+    if (purchaseState.showConfirmation && purchaseState.purchase != null){
+        AlertDialog(
+            onDismissRequest = {purchaseViewModel.dismissConfirmation()},
+            title = { Text("Ödemeyi Onayla") },
+            text = { Text("Toplam: ₺${purchaseState.purchase!!.totalCents / 100.0}\nÖdemeye devam etmek istiyor musunuz?") },
+            confirmButton = {
+                TextButton(onClick = { purchaseViewModel.confirmPayment() }) {
+                    if (purchaseState.isPaying) {
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp))
+                    } else {
+                        Text("Öde")
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { purchaseViewModel.dismissConfirmation() }) {
+                    Text("Vazgeç")
+                }
+            }
+        )
     }
 
 
@@ -44,26 +89,39 @@ fun EventDetailScreen(
         },
 
         bottomBar = {
-            if (state.event != null && state.canPurchase){
+            if (state.event != null && state.canPurchase) {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shadowElevation = 8.dp
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "Toplam: ₺ ${state.totalCents / 100.0}",
+                            text = "Toplam: ₺${state.totalCents / 100.0}",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(
-                            onClick = { /* Satın al akışı henüz yok */ },
+                            onClick = {
+                                val items = state.quantities
+                                    .filter { it.value > 0 }
+                                    .map { (ticketTypeId, quantity) ->
+                                        Pair(ticketTypeId, quantity)
+                                    }
+                                purchaseViewModel.createPurchase(items)
+                            },
                             modifier = Modifier.fillMaxWidth(),
-                            enabled = state.canPurchase
+                            enabled = state.canPurchase && !purchaseState.isCreating
                         ) {
-                            Text("Satın Al")
+                            if (purchaseState.isCreating) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp,
+                                    color = LocalContentColor.current
+                                )
+                            } else {
+                                Text("Satın Al")
+                            }
                         }
                     }
                 }
