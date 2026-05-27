@@ -48,7 +48,7 @@ class LoginViewModel(
 internal fun Throwable.toUserMessage(): String = when(this)
 {
     is ApiException -> when(code) {
-        409 -> "Email mevcut"
+        409 -> "Bu email zaten kayıtlı"
         401 -> "Email veya şifre hatalı"
         in 500..599 -> "Sunucu şu anda cevap veremiyor"
         else -> "Beklenmeyen bir hata oluştu"

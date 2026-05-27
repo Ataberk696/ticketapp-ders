@@ -31,7 +31,8 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = koinViewModel()
+    viewModel: HomeViewModel = koinViewModel(),
+    onEventClick: (String) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -39,7 +40,12 @@ fun HomeScreen(
         Column(modifier = Modifier.fillMaxSize().padding(vertical = 24.dp)) {
             Text("Yaklaşan Etkinlikler")
             Spacer(Modifier.height(8.dp))
-            EventsRow(isLoading = state.isEventsLoading, error=state.eventsError, events=state.events)
+            EventsRow(
+                isLoading = state.isEventsLoading,
+                error=state.eventsError,
+                events=state.events,
+                onEventClick = onEventClick
+                )
 
 
             Spacer(Modifier.height(8.dp))
@@ -52,7 +58,8 @@ fun HomeScreen(
 private fun EventsRow(
     isLoading: Boolean,
     error: String?,
-    events: List<Event>
+    events: List<Event>,
+    onEventClick: (String) -> Unit
 ) {
     when {
         isLoading -> {
@@ -68,17 +75,25 @@ private fun EventsRow(
         }
         else -> {
             LazyRow(contentPadding = PaddingValues(horizontal = 24.dp)) {
-                items(items=events, key = {it.id}) {event -> EventCard(event)}
+                items(items=events, key = {it.id}) {event ->
+                    EventCard(event = event, onClick = {onEventClick(event.id) })
+                }
             }
         }
     }
 }
 
 @Composable
-private fun EventCard(event: Event)
+private fun EventCard(
+    event: Event,
+    onClick: () -> Unit
+    )
 {
     Card(
-        modifier = Modifier.width(260.dp).height(280.dp)
+        modifier = Modifier
+            .width(260.dp)
+            .height(280.dp),
+        onClick = onClick
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Box(

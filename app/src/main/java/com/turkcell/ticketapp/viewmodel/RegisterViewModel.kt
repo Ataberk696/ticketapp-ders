@@ -17,7 +17,10 @@ data class RegisterUiState(
     val errorMessage: String? = null,
     val isRegistered: Boolean = false
 ) {
-    val canSubmit : Boolean get() = email.isNotBlank() && password.length >= 8 && password == passwordConfirm && !isLoading
+    val canSubmit : Boolean get() = email.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"))
+            && password.length in 8..128
+            && password == passwordConfirm
+            && !isLoading
 }
 
 class RegisterViewModel (

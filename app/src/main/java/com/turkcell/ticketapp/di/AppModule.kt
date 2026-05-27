@@ -1,6 +1,7 @@
 package com.turkcell.ticketapp.di
 
 
+import com.turkcell.ticketapp.viewmodel.EventDetailViewModel
 import com.turkcell.ticketapp.viewmodel.HomeViewModel
 import com.turkcell.ticketapp.viewmodel.LoginViewModel
 import com.turkcell.ticketapp.viewmodel.RegisterViewModel
@@ -12,4 +13,5 @@ val appModule = module {
     viewModelOf(::LoginViewModel)
     viewModelOf(::RegisterViewModel)
     viewModelOf(::HomeViewModel)
+    viewModelOf(::EventDetailViewModel)
 }
