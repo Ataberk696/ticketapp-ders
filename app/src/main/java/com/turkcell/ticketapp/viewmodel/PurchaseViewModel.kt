@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.turkcell.core.domain.purchase.Purchase
 import com.turkcell.core.domain.purchase.PurchaseRepository
-import com.turkcell.ticketapp.util.toUserMessage
+import com.turkcell.core.util.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

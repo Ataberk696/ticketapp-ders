@@ -1,4 +1,4 @@
-package com.turkcell.data.network
+package com.turkcell.core.network
 
 // Bağlantı kopuk, timeout, dns çözümleme
 class NetworkException(cause: Throwable) : RuntimeException("Network Error", cause)

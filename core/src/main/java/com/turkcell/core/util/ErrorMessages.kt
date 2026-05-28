@@ -1,7 +1,7 @@
-package com.turkcell.ticketapp.util
+package com.turkcell.core.util
 
-import com.turkcell.data.network.ApiException
-import com.turkcell.data.network.NetworkException
+import com.turkcell.core.network.ApiException
+import com.turkcell.core.network.NetworkException
 
 fun Throwable.toUserMessage(): String = when (this) {
     is ApiException -> when (code) {

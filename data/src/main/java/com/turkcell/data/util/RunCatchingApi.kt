@@ -1,8 +1,8 @@
 package com.turkcell.data.util
 
 import com.turkcell.data.dto.ErrorResponseDto
-import com.turkcell.data.network.ApiException
-import com.turkcell.data.network.NetworkException
+import com.turkcell.core.network.ApiException
+import com.turkcell.core.network.NetworkException
 import kotlinx.serialization.json.Json
 import retrofit2.HttpException
 import java.io.IOException
