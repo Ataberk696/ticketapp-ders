@@ -12,7 +12,7 @@ private val turkishMonthsShort = arrayOf(
     "Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"
 )
 
-fun formatEventDate(isoDate: String?): String? {
+fun formatEventDate(isoDate: String?): String {
     if (isoDate.isNullOrBlank()) return ""
 
     return try {

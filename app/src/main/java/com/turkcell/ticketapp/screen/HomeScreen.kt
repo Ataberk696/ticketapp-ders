@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +33,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
-    onEventClick: (String) -> Unit
+    onEventClick: (String) -> Unit,
+    onNavigateToTickets: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -50,6 +52,10 @@ fun HomeScreen(
 
             Spacer(Modifier.height(8.dp))
             Text("Satın Alınmış Biletler")
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = onNavigateToTickets) {
+                Text("Biletlerim")
+            }
         }
     }
 }
