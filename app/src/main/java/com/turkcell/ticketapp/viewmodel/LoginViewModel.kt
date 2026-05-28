@@ -3,8 +3,7 @@ package com.turkcell.ticketapp.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.turkcell.core.domain.auth.AuthRepository
-import com.turkcell.data.network.ApiException
-import com.turkcell.data.network.NetworkException
+import com.turkcell.ticketapp.util.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,6 +44,7 @@ class LoginViewModel(
     }
 }
 
+/*
 internal fun Throwable.toUserMessage(): String = when(this)
 {
     is ApiException -> when(code) {
@@ -56,3 +56,5 @@ internal fun Throwable.toUserMessage(): String = when(this)
     is NetworkException -> "İnternet bağlantısı yok"
     else -> message ?: "Bilinmeyen bir hata oluştu."
 }
+*
+* */
