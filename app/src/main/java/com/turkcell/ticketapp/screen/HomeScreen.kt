@@ -4,8 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -46,43 +49,51 @@ fun HomeScreen(
             )
         }
     ) { paddingValues ->
-        Column(
+        PullToRefreshBox(
+            isRefreshing = state.isEventsRefreshing,
+            onRefresh = viewModel::refreshEvents,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(vertical = 24.dp)
         ) {
-            Text(
-                text = stringResource(R.string.upcoming_events),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-            Spacer(Modifier.height(8.dp))
-            EventsRow(
-                isLoading = state.isEventsLoading,
-                error = state.eventsError,
-                events = state.events,
-                onEventClick = onEventClick
-            )
-            Spacer(Modifier.height(24.dp))
-            Text(
-                text = stringResource(R.string.purchased_tickets),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-            Spacer(Modifier.height(8.dp))
-            Button(
-                onClick = onNavigateToTickets,
+            Column(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .height(48.dp)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(vertical = 24.dp)
             ) {
                 Text(
-                    stringResource(R.string.my_tickets_button),
-                    style = MaterialTheme.typography.titleMedium
+                    text = stringResource(R.string.upcoming_events),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
+                Spacer(Modifier.height(8.dp))
+                EventsRow(
+                    isLoading = state.isEventsLoading,
+                    error = state.eventsError,
+                    events = state.events,
+                    onEventClick = onEventClick
+                )
+                Spacer(Modifier.height(24.dp))
+                Text(
+                    text = stringResource(R.string.purchased_tickets),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+                Spacer(Modifier.height(8.dp))
+                Button(
+                    onClick = onNavigateToTickets,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .height(48.dp)
+                ) {
+                    Text(
+                        stringResource(R.string.my_tickets_button),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
             }
         }
     }
@@ -159,7 +170,6 @@ private fun EventCard(
         onClick = onClick
     ) {
         Column {
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -171,7 +181,6 @@ private fun EventCard(
                     ),
                 contentAlignment = Alignment.Center
             ) {
-
                 Text(
                     text = event.name.take(1).uppercase().ifBlank { "?" },
                     style = MaterialTheme.typography.displayLarge,
@@ -180,13 +189,11 @@ private fun EventCard(
                 )
             }
 
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-
                 Text(
                     text = event.name,
                     style = MaterialTheme.typography.titleMedium,
@@ -196,14 +203,12 @@ private fun EventCard(
                 )
                 Spacer(Modifier.height(4.dp))
 
-
                 Text(
                     text = formatEventDate(event.startsAt),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.height(4.dp))
-
 
                 Text(
                     text = event.venue,
@@ -212,7 +217,6 @@ private fun EventCard(
                     overflow = TextOverflow.Ellipsis
                 )
                 Spacer(Modifier.height(8.dp))
-
 
                 Text(
                     text = event.description,
