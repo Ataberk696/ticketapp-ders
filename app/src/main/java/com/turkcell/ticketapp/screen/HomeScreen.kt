@@ -1,35 +1,31 @@
 package com.turkcell.ticketapp.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.turkcell.core.domain.event.Event
+import com.turkcell.core.ui.theme.BrandPrimary
+import com.turkcell.core.ui.theme.BrandPrimaryDark
+import com.turkcell.core.util.formatEventDate
+import com.turkcell.ticketapp.R
 import com.turkcell.ticketapp.viewmodel.HomeViewModel
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
@@ -38,23 +34,55 @@ fun HomeScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    Surface (modifier= Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize().padding(vertical = 24.dp)) {
-            Text("Yaklaşan Etkinlikler")
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.home_title)) },
+                actions = {
+                    TextButton(onClick = { viewModel.logout() }) {
+                        Text(stringResource(R.string.logout_button))
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(vertical = 24.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.upcoming_events),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
             Spacer(Modifier.height(8.dp))
             EventsRow(
                 isLoading = state.isEventsLoading,
-                error=state.eventsError,
-                events=state.events,
+                error = state.eventsError,
+                events = state.events,
                 onEventClick = onEventClick
-                )
-
-
+            )
+            Spacer(Modifier.height(24.dp))
+            Text(
+                text = stringResource(R.string.purchased_tickets),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
             Spacer(Modifier.height(8.dp))
-            Text("Satın Alınmış Biletler")
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = onNavigateToTickets) {
-                Text("Biletlerim")
+            Button(
+                onClick = onNavigateToTickets,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .height(48.dp)
+            ) {
+                Text(
+                    stringResource(R.string.my_tickets_button),
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
         }
     }
@@ -69,20 +97,48 @@ private fun EventsRow(
 ) {
     when {
         isLoading -> {
-            Box(modifier = Modifier.fillMaxWidth().height(220.dp)){
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp),
+                contentAlignment = Alignment.Center
+            ) {
                 CircularProgressIndicator()
             }
         }
         error != null -> {
-            Text(error)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(error, color = MaterialTheme.colorScheme.error)
+            }
         }
         events.isEmpty() -> {
-            Text(text="Şimdilik hiç bir etkinlik yok.", style= MaterialTheme.typography.bodyMedium)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.no_events),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
         else -> {
-            LazyRow(contentPadding = PaddingValues(horizontal = 24.dp)) {
-                items(items=events, key = {it.id}) {event ->
-                    EventCard(event = event, onClick = {onEventClick(event.id) })
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(items = events, key = { it.id }) { event ->
+                    EventCard(
+                        event = event,
+                        onClick = { onEventClick(event.id) }
+                    )
                 }
             }
         }
@@ -93,32 +149,79 @@ private fun EventsRow(
 private fun EventCard(
     event: Event,
     onClick: () -> Unit
-    )
-{
+) {
     Card(
         modifier = Modifier
-            .width(260.dp)
-            .height(280.dp),
+            .width(280.dp)
+            .height(340.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         onClick = onClick
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column {
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(140.dp)
-                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center,
+                    .height(160.dp)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(BrandPrimary, BrandPrimaryDark)
+                        )
+                    ),
+                contentAlignment = Alignment.Center
             ) {
+
                 Text(
                     text = event.name.take(1).uppercase().ifBlank { "?" },
-                    style = MaterialTheme.typography.displayMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    style = MaterialTheme.typography.displayLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
                 )
             }
-            Text(event.name)
-            Text(event.venue)
-            Text(event.description)
+
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+
+                Text(
+                    text = event.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(Modifier.height(4.dp))
+
+
+                Text(
+                    text = formatEventDate(event.startsAt),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.height(4.dp))
+
+
+                Text(
+                    text = event.venue,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(Modifier.height(8.dp))
+
+
+                Text(
+                    text = event.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }

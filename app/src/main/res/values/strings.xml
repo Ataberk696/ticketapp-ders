@@ -1,3 +1,55 @@
 <resources>
-    <string name="app_name">Ticket App</string>
+
+    <string name="app_name">TicketApp</string>
+
+    <!-- Login -->
+    <string name="login_title">Giriş Yap</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Şifre</string>
+    <string name="login_button">Giriş Yap</string>
+    <string name="no_account_register">Hesabın yok mu? Kayıt ol</string>
+
+    <!-- Register -->
+    <string name="register_title">Kayıt Ol</string>
+    <string name="password_confirm_label">Şifre Tekrarı</string>
+    <string name="register_button">Kayıt Ol</string>
+    <string name="already_have_account">Zaten hesabın var mı? Giriş yap</string>
+
+    <!-- Home -->
+    <string name="home_title">Ana Sayfa</string>
+    <string name="upcoming_events">Yaklaşan Etkinlikler</string>
+    <string name="purchased_tickets">Satın Alınmış Biletler</string>
+    <string name="my_tickets_button">Biletlerim</string>
+    <string name="no_events">Şimdilik hiç bir etkinlik yok.</string>
+    <string name="logout_button">Çıkış</string>
+
+    <!-- Event Detail -->
+    <string name="event_detail_title">Etkinlik Detayı</string>
+    <string name="back_button">Geri</string>
+    <string name="ticket_types_label">Bilet Türleri</string>
+    <string name="total_price">Toplam: ₺%.2f</string>
+    <string name="buy_button">Satın Al</string>
+    <string name="event_venue">Yer: %s</string>
+    <string name="event_date">Tarih: %s</string>
+    <string name="ticket_type_info">₺%.2f | Kalan: %d/%d</string>
+
+    <!-- Purchase -->
+    <string name="confirm_payment_title">Ödemeyi Onayla</string>
+    <string name="confirm_payment_text">Toplam: ₺%.2f\nÖdemeye devam etmek istiyor musunuz?</string>
+    <string name="pay_button">Öde</string>
+    <string name="cancel_button">Vazgeç</string>
+    <string name="error_title">Hata</string>
+    <string name="ok_button">Tamam</string>
+
+    <!-- My Tickets -->
+    <string name="my_tickets_title">Biletlerim</string>
+    <string name="no_tickets">Henüz hiç biletiniz yok</string>
+    <string name="try_again">Tekrar Dene</string>
+    <string name="ticket_valid">Geçerli</string>
+    <string name="ticket_used">Kullanıldı</string>
+
+    <!-- Ticket Detail -->
+    <string name="ticket_detail_title">Bilet QR</string>
+    <string name="qr_failed">QR oluşturulamadı</string>
+    <string name="ticket_status_label">Durum: %s</string>
 </resources>

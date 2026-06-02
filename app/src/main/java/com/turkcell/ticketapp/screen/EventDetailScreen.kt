@@ -1,6 +1,5 @@
 package com.turkcell.ticketapp.screen
 
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,16 +7,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.turkcell.core.domain.event.TicketType
 import com.turkcell.core.util.formatEventDate
+import com.turkcell.ticketapp.R
 import com.turkcell.ticketapp.viewmodel.EventDetailViewModel
 import com.turkcell.ticketapp.viewmodel.PurchaseViewModel
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,8 +26,7 @@ fun EventDetailScreen(
     purchaseViewModel: PurchaseViewModel = koinViewModel(),
     onBack: () -> Unit,
     onPurchaseSuccess: () -> Unit = {}
-)
-{
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val purchaseState by purchaseViewModel.state.collectAsStateWithLifecycle()
 
@@ -42,52 +40,59 @@ fun EventDetailScreen(
         }
     }
 
-    if (purchaseState.error !=null){
+
+    if (purchaseState.error != null) {
         AlertDialog(
-            onDismissRequest = {purchaseViewModel.consumeError()},
-            title = { Text("Hata") },
+            onDismissRequest = { purchaseViewModel.consumeError() },
+            title = { Text(stringResource(R.string.error_title)) },
             text = { Text(purchaseState.error!!) },
             confirmButton = {
-                TextButton(onClick = {purchaseViewModel.consumeError()}) {
-                    Text("Tamam")
+                TextButton(onClick = { purchaseViewModel.consumeError() }) {
+                    Text(stringResource(R.string.ok_button))
                 }
             }
         )
     }
 
-    if (purchaseState.showConfirmation && purchaseState.purchase != null){
+
+    if (purchaseState.showConfirmation && purchaseState.purchase != null) {
+        val price = purchaseState.purchase!!.totalCents / 100.0
         AlertDialog(
-            onDismissRequest = {purchaseViewModel.dismissConfirmation()},
-            title = { Text("Ödemeyi Onayla") },
-            text = { Text("Toplam: ₺${purchaseState.purchase!!.totalCents / 100.0}\nÖdemeye devam etmek istiyor musunuz?") },
+            onDismissRequest = { purchaseViewModel.dismissConfirmation() },
+            title = { Text(stringResource(R.string.confirm_payment_title)) },
+            text = {
+                Text(
+                    stringResource(R.string.confirm_payment_text, price)
+                )
+            },
             confirmButton = {
                 TextButton(onClick = { purchaseViewModel.confirmPayment() }) {
                     if (purchaseState.isPaying) {
                         CircularProgressIndicator(modifier = Modifier.size(20.dp))
                     } else {
-                        Text("Öde")
+                        Text(stringResource(R.string.pay_button))
                     }
                 }
             },
             dismissButton = {
                 TextButton(onClick = { purchaseViewModel.dismissConfirmation() }) {
-                    Text("Vazgeç")
+                    Text(stringResource(R.string.cancel_button))
                 }
             }
         )
     }
 
-
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text ("Etkinlik Detayı")},
+                title = { Text(stringResource(R.string.event_detail_title)) },
                 navigationIcon = {
-                    TextButton(onClick = onBack) { Text("Geri") }
+                    TextButton(onClick = onBack) {
+                        Text(stringResource(R.string.back_button))
+                    }
                 }
             )
         },
-
         bottomBar = {
             if (state.event != null && state.canPurchase) {
                 Surface(
@@ -96,7 +101,10 @@ fun EventDetailScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "Toplam: ₺${state.totalCents / 100.0}",
+                            text = stringResource(
+                                R.string.total_price,
+                                state.totalCents / 100.0
+                            ),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -120,15 +128,13 @@ fun EventDetailScreen(
                                     color = LocalContentColor.current
                                 )
                             } else {
-                                Text("Satın Al")
+                                Text(stringResource(R.string.buy_button))
                             }
                         }
                     }
                 }
             }
         }
-
-
     ) { paddingValues ->
         when {
             state.isLoading -> {
@@ -139,9 +145,10 @@ fun EventDetailScreen(
                     CircularProgressIndicator()
                 }
             }
-            state.error != null ->{
+            state.error != null -> {
                 Box(
-                    modifier = Modifier.fillMaxSize().padding(paddingValues)
+                    modifier = Modifier.fillMaxSize().padding(paddingValues),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(state.error!!, color = MaterialTheme.colorScheme.error)
                 }
@@ -165,17 +172,20 @@ fun EventDetailScreen(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Yer: ${event.venue}",
+                            text = stringResource(R.string.event_venue, event.venue),
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Tarih: ${formatEventDate(event.startsAt)}",
+                            text = stringResource(
+                                R.string.event_date,
+                                formatEventDate(event.startsAt)
+                            ),
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Bilet Türleri",
+                            text = stringResource(R.string.ticket_types_label),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -193,7 +203,6 @@ fun EventDetailScreen(
                 }
             }
         }
-
     }
 }
 
@@ -203,7 +212,7 @@ private fun TicketTypeRow(
     quantity: Int,
     onIncrease: () -> Unit,
     onDecrease: () -> Unit
-){
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -222,7 +231,12 @@ private fun TicketTypeRow(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = "₺${ticketType.priceCents / 100.0} | Kalan: ${ticketType.remaining}/${ticketType.capacity}",
+                    text = stringResource(
+                        R.string.ticket_type_info,
+                        ticketType.priceCents / 100.0,
+                        ticketType.remaining,
+                        ticketType.capacity
+                    ),
                     style = MaterialTheme.typography.bodySmall
                 )
             }

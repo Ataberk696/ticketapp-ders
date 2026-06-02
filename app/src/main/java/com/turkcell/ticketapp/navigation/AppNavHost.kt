@@ -20,6 +20,7 @@ import com.turkcell.ticketapp.screen.HomeScreen
 import com.turkcell.ticketapp.screen.LoginScreen
 import com.turkcell.ticketapp.screen.MyTicketsScreen
 import com.turkcell.ticketapp.screen.RegisterScreen
+import com.turkcell.ticketapp.screen.TicketDetailScreen
 import org.koin.compose.koinInject
 
 
@@ -62,9 +63,11 @@ private fun AuthedNavHost(navController: NavHostController){
             val route: EventDetail = backStackEntry.toRoute()
             EventDetailScreen(
                 eventId = route.id,
-                onBack = {navController.popBackStack()},
+                onBack = { navController.popBackStack() },
                 onPurchaseSuccess = {
-                    navController.popBackStack()
+                    navController.navigate(MyTickets) {
+                        popUpTo(Home) { inclusive = false }
+                    }
                 }
             )
         }
@@ -78,7 +81,10 @@ private fun AuthedNavHost(navController: NavHostController){
         }
         composable<TicketDetail> { backStackEntry ->
             val route: TicketDetail = backStackEntry.toRoute()
-            Text("QR Ekranı: ${route.ticketId}")
+            TicketDetailScreen(
+                ticketId = route.ticketId,
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }

@@ -9,11 +9,14 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource          // ← eklendi
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.turkcell.core.domain.purchase.MyTicket
+import com.turkcell.core.domain.purchase.TicketStatus
 import com.turkcell.core.util.formatEventDate
+import com.turkcell.ticketapp.R                       // ← eklendi
 import com.turkcell.ticketapp.viewmodel.MyTicketsViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -29,10 +32,10 @@ fun MyTicketsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Biletlerim") },
+                title = { Text(stringResource(R.string.my_tickets_title)) },
                 navigationIcon = {
                     TextButton(onClick = onBack) {
-                        Text("← Geri")
+                        Text(stringResource(R.string.back_button))
                     }
                 }
             )
@@ -58,12 +61,12 @@ fun MyTicketsScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = state.error ?: "Bir hata oluştu.",
+                            text = state.error ?: stringResource(R.string.error_title),
                             color = MaterialTheme.colorScheme.error
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         TextButton(onClick = { viewModel.loadTickets() }) {
-                            Text("Tekrar deneyin.")
+                            Text(stringResource(R.string.try_again))
                         }
                     }
                 }
@@ -74,7 +77,7 @@ fun MyTicketsScreen(
                     modifier = Modifier.fillMaxSize().padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Henüz biletiniz yok.")
+                    Text(stringResource(R.string.no_tickets))
                 }
             }
             // içerik
@@ -105,7 +108,7 @@ fun MyTicketsScreen(
 private fun TicketCard(
     ticket: MyTicket,
     onClick: () -> Unit
-){
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         onClick = onClick
@@ -132,9 +135,12 @@ private fun TicketCard(
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = if (ticket.status == com.turkcell.core.domain.purchase.TicketStatus.VALID) "Geçerli" else "Kullanıldı",
+                    text = if (ticket.status == TicketStatus.VALID)
+                        stringResource(R.string.ticket_valid)
+                    else
+                        stringResource(R.string.ticket_used),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (ticket.status == com.turkcell.core.domain.purchase.TicketStatus.VALID)
+                    color = if (ticket.status == TicketStatus.VALID)
                         MaterialTheme.colorScheme.primary
                     else
                         MaterialTheme.colorScheme.error

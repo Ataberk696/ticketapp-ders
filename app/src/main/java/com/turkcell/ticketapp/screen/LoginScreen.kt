@@ -22,10 +22,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.turkcell.ticketapp.R
 import com.turkcell.ticketapp.viewmodel.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -50,13 +52,13 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text("Giriş Yap", style = MaterialTheme.typography.displaySmall)
+            Text(stringResource(R.string.login_title), style = MaterialTheme.typography.displaySmall)
             Spacer(Modifier.height(24.dp))
 
             OutlinedTextField(
                 value = state.email,
                 onValueChange = viewModel::onEmailChange,
-                label = { Text("Email") },
+                label = { Text(stringResource(R.string.email_label)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth(),
@@ -66,7 +68,7 @@ fun LoginScreen(
             OutlinedTextField(
                 value = state.password,
                 onValueChange = viewModel::onPasswordChange,
-                label = { Text("Şifre") },
+                label = { Text(stringResource(R.string.password_label)) },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -95,13 +97,13 @@ fun LoginScreen(
                         color = LocalContentColor.current,
                     )
                 } else {
-                    Text("Giriş Yap")
+                    Text(stringResource(R.string.login_button))
                 }
             }
 
             Spacer(Modifier.height(24.dp))
             TextButton(onClick = onNavigateToRegister) {
-                Text("Hesabın yok mu? Kayıt ol")
+                Text(stringResource(R.string.no_account_register))
             }
         }
     }
