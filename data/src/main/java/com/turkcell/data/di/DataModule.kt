@@ -1,6 +1,7 @@
 package com.turkcell.data.di
 
 import com.turkcell.core.domain.auth.AuthRepository
+import com.turkcell.core.domain.checkin.CheckinRepository
 import com.turkcell.core.domain.event.EventRepository
 import com.turkcell.core.domain.purchase.PurchaseRepository
 import com.turkcell.core.domain.purchase.TicketRepository
@@ -8,10 +9,12 @@ import com.turkcell.data.local.TokenStore
 import com.turkcell.data.network.AuthInterceptor
 import com.turkcell.data.network.TokenAuthenticator
 import com.turkcell.data.remote.AuthApi
+import com.turkcell.data.remote.CheckinApi
 import com.turkcell.data.remote.EventApi
 import com.turkcell.data.remote.MeApi
 import com.turkcell.data.remote.PurchaseApi
 import com.turkcell.data.repository.AuthRepositoryImpl
+import com.turkcell.data.repository.CheckinRepositoryImpl
 import com.turkcell.data.repository.EventRepositoryImpl
 import com.turkcell.data.repository.PurchaseRepositoryImpl
 import com.turkcell.data.repository.TicketRepositoryImpl
@@ -114,6 +117,9 @@ val dataModule = module {
     single {
         get<Retrofit>().create(MeApi::class.java)
     }
+    single {
+        get<Retrofit>().create(CheckinApi::class.java)
+    }
 
 
     single<AuthRepository> {
@@ -138,6 +144,12 @@ val dataModule = module {
     single<TicketRepository>{
         TicketRepositoryImpl(
             meApi = get()
+        )
+    }
+
+    single<CheckinRepository> {
+        CheckinRepositoryImpl(
+            checkinApi = get()
         )
     }
 

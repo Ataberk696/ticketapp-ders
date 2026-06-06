@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,11 +16,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.turkcell.core.domain.auth.AuthRepository
+import com.turkcell.core.domain.auth.UserRole
 import com.turkcell.ticketapp.screen.EventDetailScreen
 import com.turkcell.ticketapp.screen.HomeScreen
 import com.turkcell.ticketapp.screen.LoginScreen
 import com.turkcell.ticketapp.screen.MyTicketsScreen
 import com.turkcell.ticketapp.screen.RegisterScreen
+import com.turkcell.ticketapp.screen.StaffScreen
 import com.turkcell.ticketapp.screen.TicketDetailScreen
 import org.koin.compose.koinInject
 
@@ -30,12 +33,25 @@ fun AppNavHost(
     authRepository: AuthRepository = koinInject()
 )
 {
-    val isLoggedIn by authRepository.isLoggedIn.collectAsStateWithLifecycle(initialValue = null)
+    val isLoggedIn by authRepository.isLoggedIn.collectAsStateWithLifecycle(initialValue = false)
+    val currentUser by authRepository.currentUser.collectAsStateWithLifecycle(initialValue = null)
 
-    when(isLoggedIn){
-        null -> SplashScreen()
-        true -> AuthedNavHost(navController)
-        false -> UnAuthedNavHost(navController)
+    LaunchedEffect(isLoggedIn, currentUser) {
+        if (isLoggedIn && currentUser == null) {
+            authRepository.logout()
+        }
+    }
+
+    when {
+        !isLoggedIn -> UnAuthedNavHost(navController)
+        currentUser == null -> SplashScreen()
+        else -> {
+            when (currentUser!!.role) {
+                UserRole.USER -> AuthedNavHost(navController)
+                UserRole.STAFF -> StaffNavHost(navController)
+                UserRole.ADMIN -> AdminNavHost(navController)
+            }
+        }
     }
 
 }
@@ -107,6 +123,24 @@ private fun UnAuthedNavHost(navController: NavHostController){
                 },
                 onNavigateToLogin = {navController.navigate(Login)}
             )
+        }
+    }
+}
+@Composable
+private fun StaffNavHost(navController: NavHostController) {
+    NavHost(navController = navController, startDestination = Staff) {
+        composable<Staff> {
+            StaffScreen()
+        }
+    }
+}
+
+@Composable
+private fun AdminNavHost(navController: NavHostController) {
+    // İleride admin ekranlarını olursa buraya eklicem.
+    NavHost(navController = navController, startDestination = Home) {
+        composable<Home> {
+            Text("Admin Paneli")
         }
     }
 }

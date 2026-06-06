@@ -9,6 +9,7 @@ import com.turkcell.data.local.TokenStore
 import com.turkcell.data.remote.AuthApi
 import com.turkcell.data.util.runCatchingApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 class AuthRepositoryImpl(
@@ -17,22 +18,42 @@ class AuthRepositoryImpl(
 ) : AuthRepository {
     override val isLoggedIn: Flow<Boolean> = tokenStore.accessToken.map { it != null }
 
+    override val currentUser: Flow<User?> = combine(
+        tokenStore.userId,
+        tokenStore.userEmail,
+        tokenStore.userRole
+    ) { id, email, role ->
+        if (id != null && email != null && role != null)
+            User(id, email, UserRole.fromApi(role))
+        else
+            null
+    }
+
 
     override suspend fun login(
         email: String,
         password: String
     ): Result<AuthSession> = runCatchingApi {
         authApi.login(CredentialsDto(email=email, password=password))
-    }.onSuccess {
-        tokenStore.save(it.accessToken, it.refreshToken)
+    }.onSuccess { tokenPair->
+        tokenStore.saveAll(
+            access = tokenPair.accessToken,
+            refresh = tokenPair.refreshToken,
+            userId = tokenPair.user.id,
+            userEmail = tokenPair.user.email,
+            userRole = tokenPair.user.role
+        )
     }
-    .map {
-        TokenPairDto -> AuthSession(
-        user = User(
-            TokenPairDto.user.id,  TokenPairDto.user.email, UserRole.fromApi( TokenPairDto.user.role),
-        ),
-        accessToken =  TokenPairDto.accessToken,
-        refreshToken =  TokenPairDto.refreshToken)
+    .map { tokenPairDto ->
+        AuthSession(
+            user = User(
+                id = tokenPairDto.user.id,
+                email = tokenPairDto.user.email,
+                role = UserRole.fromApi(tokenPairDto.user.role)
+            ),
+            accessToken = tokenPairDto.accessToken,
+            refreshToken = tokenPairDto.refreshToken
+        )
     }
 
 
@@ -42,18 +63,24 @@ class AuthRepositoryImpl(
     ): Result<AuthSession>  = runCatchingApi {
         authApi.register(CredentialsDto(email=email, password=password))
     }
-        .onSuccess {
-            // jwt kaydet.
+        .onSuccess { tokenPair ->
+            tokenStore.saveAll(
+                access = tokenPair.accessToken,
+                refresh = tokenPair.refreshToken,
+                userId = tokenPair.user.id,
+                userEmail = tokenPair.user.email,
+                userRole = tokenPair.user.role
+            )
         }
-        .map {
-            i -> AuthSession(
+        .map { tokenPairDto ->
+            AuthSession(
                 user = User(
-                    id = i.user.id,
-                    email = i.user.email,
-                    role = UserRole.fromApi(i.user.role)
+                    id = tokenPairDto.user.id,
+                    email = tokenPairDto.user.email,
+                    role = UserRole.fromApi(tokenPairDto.user.role)
                 ),
-                accessToken = i.accessToken,
-                refreshToken = i.refreshToken
+                accessToken = tokenPairDto.accessToken,
+                refreshToken = tokenPairDto.refreshToken
             )
         }
 

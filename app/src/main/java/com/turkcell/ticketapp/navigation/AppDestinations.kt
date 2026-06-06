@@ -15,3 +15,6 @@ object MyTickets
 
 @Serializable
 data class TicketDetail(val ticketId: String)
+
+@Serializable
+object Staff
